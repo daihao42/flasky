@@ -1,0 +1,20 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{{ moment.include_moment() }}
+
+{% block title %}首页{% endblock %}
+
+{% block beforehead %}
+
+<style>
+	
+</style>
+
+{% endblock %}
+
+{% block content %}
+<p>The local date and time is {{ moment(current_time).format('LLL') }}.</p>
+<p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{% block title %}注册{% endblock %}
+
+{% block beforehead %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css" />
+<script src="/static/js/vue.min.js"></script> 
+<script src="/static/js/sha1.min.js"></script> 
+<style>
+    .form-control {
+    width: 100%;
+    margin-bottom: 17px;
+    padding: 15px;
+    background-color: #ECF4F4;
+    border-radius: 2px;
+    border: none;
+  }
+
+    .container {
+    text-align: center;
+    width: 300px;
+    border-radius: 0.5rem;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 10px auto;
+    background-color: #555;
+    padding: 20px;
+  }
+    label {
+    color: #ECF4F4;
+    }
+</style>
+
+<script>
+  function validateEmail(email) {
+    var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
+    return re.test(email.toLowerCase());
+  }
+
+  function showFormError(str){
+    info = "<div class='alert alert-warning alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
+    info+=str;
+    info+="</div>"
+    $("div").remove(".alert");
+    $("form").prepend(info)
+  }
+
+$(function () {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            name: '',
+            email: '',
+            password1: '',
+            password2: ''
+        },
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                var $form = $('#vm');
+                if (! this.name.trim()) {
+                    return showFormError('请输入名字');
+                }
+                if (! validateEmail(this.email.trim().toLowerCase())) {
+                    return showFormError('请输入正确的Email地址');
+                }
+                if (this.password1.length < 6) {
+                    return showFormError('口令长度至少为6个字符');
+                }
+                if (this.password1 !== this.password2) {
+                    return showFormError('两次输入的口令不一致');
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/register",
+                    data: {name: this.name.trim(),
+                          email: this.email,
+                          passwd: CryptoJS.SHA1(this.email + ':' + this.password1).toString()},
+                    dataType: "text",
+                    success: function(data){
+                            return location.assign('/');
+                      },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert(XMLHttpRequest.status);
+                        alert(XMLHttpRequest.readyState);
+                        alert(textStatus);
+                    },
+                  });
+            }
+        }
+    });
+    $('#vm').show();
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <form class="form-vertical" id="vm" v-on="submit: submit">
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-envelope"></i>
+            </label>
+          <label class="control-label">电子邮箱</label>
+          <div class="controls">
+            <input class="form-control" v-model="email" type="text" required placeholder='邮箱' />
+            <div class="help-block"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-user"></i>
+            </label>
+          <label class="control-label">昵称</label>
+          <div class="controls">
+            <input class="form-control" v-model="name" type="text" required placeholder='昵称' />
+            <div class="help-block"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+            <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">密码</label>
+          <div class="controls">
+            <input class="form-control" v-model="password1" type="password" required placeholder='密码'/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">重复密码</label>
+          <div class="controls">
+            <input class="form-control" v-model="password2" type="password" required placeholder='密码'/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="controls">
+            <span class="checkbox mtm ">
+              <label> <input type="checkbox" v-model="_remember_me" checked="checked"> 同意协议 </label>
+            </span>
+          </div>
+          <input class="login-btn btn-primary btn" type="submit" value="注册" />        </div>
+      </form> 
+</div>
+{% endblock %}
