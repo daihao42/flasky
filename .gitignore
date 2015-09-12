@@ -1,0 +1,4 @@
+#config ignore
+**__pycache__
+data-dev.sqlite
+venv
