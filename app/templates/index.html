@@ -2,7 +2,7 @@
 
 {{ super() }}
 
-{% block title %}注册{% endblock %}
+{% block title %}首页{% endblock %}
 
 {% block beforehead %}
 
@@ -15,6 +15,7 @@
 {% if current_user.is_authenticated %}
 {{ current_user.username }}
 <img src={{ current_user.image }}>
+<a href="/user/{{ current_user.username }}">个人主页</a>
 {% else %}
 Stranger
 {% endif %}!

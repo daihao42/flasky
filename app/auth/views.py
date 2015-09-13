@@ -42,3 +42,11 @@ def register():
 			db.session.commit()
 			login_user(user, False)
 	return render_template('auth/register.html')
+
+
+#更新用户最后访问时间
+from flask.ext.login import current_user
+@auth.before_app_request
+def before_request():
+	if current_user.is_authenticated:
+		current_user.ping()

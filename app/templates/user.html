@@ -1,0 +1,213 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{% block title %}个人主页{% endblock %}
+
+{% block beforehead %}
+<script src="/static/js/vue.min.js"></script> 
+
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+
+{% if user == current_user %}
+<!-- common user -->
+<script>
+  function showFormError(str){
+    info = "<div class='alert alert-warning alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
+    info+=str;
+    info+="</div>"
+    $("div").remove(".alert");
+    $("form").prepend(info)
+  }
+
+function initVM(userinfo){
+    var vm = new Vue({
+        el: '#vm',
+        data: userinfo,
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                var $form = $('#vm');
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/edit-profile",
+                    data: {username: this.username.trim(),
+                          location: this.location,
+                          about_me: this.about_me},
+                    dataType: "text",
+                    success: function(data){
+                            return location.assign('/');
+                      },
+                    error: function (msg) {
+                    showFormError(msg.responseText);
+                } 
+                  });
+            }
+        }
+    });
+    $('#vm').show();
+}
+
+$(function () {
+        initVM({
+            username: "{{user.username}}",
+            location: "{{user.location}}",
+            about_me: "{{user.about_me}}"
+        });
+});
+</script>
+
+<img src="{{user.image}}">
+
+<div class="container">
+  <form class="form-vertical" id="vm" v-on="submit: submit">
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-user"></i>
+            </label>
+          <label class="control-label">昵称</label>
+          <div class="controls">
+            <input class="form-control" v-model="username" type="text" required placeholder='昵称' />
+            <div class="help-block"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+            <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">居住地</label>
+          <div class="controls">
+            <input class="form-control" v-model="location" type="text" required placeholder='居住地'/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">个人介绍</label>
+          <div class="controls">
+             <textarea v-model="about_me" rows="16" placeholder="个人介绍" style="resize:none;"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input class="login-btn btn-primary btn" type="submit" value="提交" />
+          </div>
+      </form> 
+</div>
+
+{% elif current_user.is_administrator() %}
+<!-- administrator -->
+<script>
+  function showFormError(str){
+    info = "<div class='alert alert-warning alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
+    info+=str;
+    info+="</div>"
+    $("div").remove(".alert");
+    $("form").prepend(info)
+  }
+
+function initVM(userinfo){
+    var vm = new Vue({
+        el: '#vm',
+        data: userinfo,
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                var $form = $('#vm');
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/edit-profile",
+                    data: {username: this.username.trim(),
+                          location: this.location,
+                          about_me: this.about_me},
+                    dataType: "text",
+                    success: function(data){
+                            return location.assign('/');
+                      },
+                    error: function (msg) {
+                    showFormError(msg.responseText);
+                } 
+                  });
+            }
+        }
+    });
+    $('#vm').show();
+}
+
+$(function () {
+        initVM({
+            username: "{{user.username}}",
+            location: "{{user.location}}",
+            about_me: "{{user.about_me}}"
+        });
+});
+</script>
+
+<img src="{{user.image}}">
+
+<div class="container">
+  <form class="form-vertical" id="vm" v-on="submit: submit">
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-user"></i>
+            </label>
+          <label class="control-label">昵称</label>
+          <div class="controls">
+            <input class="form-control" v-model="username" type="text" required placeholder='昵称' />
+            <div class="help-block"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+            <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">居住地</label>
+          <div class="controls">
+            <input class="form-control" v-model="location" type="text" required placeholder='居住地'/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">个人介绍</label>
+          <div class="controls">
+             <textarea v-model="about_me" rows="16" placeholder="个人介绍" style="resize:none;"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input class="login-btn btn-primary btn" type="submit" value="提交" />
+          </div>
+      </form> 
+</div>
+
+
+{% else %}
+<!-- common visitor -->
+	<h1>{{ user.username }}</h1>
+	<img src="{{user.image}}">
+	{% if user.location %}
+	<p>
+		<a href="http://maps.google.com/?q={{ user.location }}">
+		{{ user.location }}</a>
+		</p>
+	{% endif %}
+	
+		{% if current_user.is_administrator() %}
+		<p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+		{% endif %}
+		{% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+{% endif %}
+
+{% endblock %}

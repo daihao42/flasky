@@ -1,4 +1,4 @@
-import time
+import datetime
 from app import db
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -54,8 +54,11 @@ class User(UserMixin,db.Model):
 	username = db.Column(db.String(64), unique=True, index=True)
 	password_hash = db.Column(db.String(128))
 	image = db.Column(db.String(64))
-	created_at =db.Column(db.Float, default=time.time)
 	role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+	location = db.Column(db.String(64))
+	about_me = db.Column(db.Text())
+	member_since = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+	last_seen = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
 	def __init__(self, **kwargs):
 		super(User, self).__init__(**kwargs)
@@ -84,6 +87,11 @@ class User(UserMixin,db.Model):
 		#检查管理员权限
 	def is_administrator(self):
 		return self.can(Permission.ADMINISTER)
+
+	#记录最后访问时间
+	def ping(self):
+		self.last_seen = datetime.datetime.utcnow()
+		db.session.add(self)
 
 class AnonymousUser(AnonymousUserMixin):
 	def can(self, permissions):
