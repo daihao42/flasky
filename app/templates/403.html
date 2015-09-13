@@ -1,0 +1,37 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{% block title %}登陆{% endblock %}
+
+{% block beforehead %}
+<link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css" />
+  <style>
+  body{
+    font-family: 'microsoft yahei',Arial,sans-serif;
+    background-color: #222;
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    font-weight: normal;
+    color: #EFEFEF;
+  }
+
+    h1 {
+    color: #FF66CC;
+    }
+
+
+  </style>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 align="center">403 Forbidden</h2>
+
+<h1 align="center">It Seems You Have No Permission</h1>
+
+
+{% endblock %}

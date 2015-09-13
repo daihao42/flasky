@@ -8,8 +8,11 @@
 
 <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css" />
 <script src="/static/js/vue.min.js"></script> 
-<script src="/static/js/sha1.min.js"></script> 
 <style>
+  body{
+    font-family: 'microsoft yahei',Arial,sans-serif;
+    background-color: #222;
+  }
     .form-control {
     width: 100%;
     margin-bottom: 17px;
@@ -63,7 +66,7 @@ $(function () {
             submit: function (event) {
                 event.preventDefault();
                 var $form = $('#vm');
-                if (! this.name.trim()) {
+                if (! this.username.trim()) {
                     return showFormError('请输入名字');
                 }
                 if (! validateEmail(this.email.trim().toLowerCase())) {
@@ -77,19 +80,17 @@ $(function () {
                 }
                 $.ajax({
                     type: "POST",
-                    url: "/register",
-                    data: {name: this.name.trim(),
+                    url: "/auth/register",
+                    data: {username: this.username.trim(),
                           email: this.email,
-                          passwd: CryptoJS.SHA1(this.email + ':' + this.password1).toString()},
+                          passwd: this.password1},
                     dataType: "text",
                     success: function(data){
                             return location.assign('/');
                       },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert(XMLHttpRequest.status);
-                        alert(XMLHttpRequest.readyState);
-                        alert(textStatus);
-                    },
+                    error: function (msg) {
+                    showFormError(msg.responseText);
+                } 
                   });
             }
         }
@@ -121,7 +122,7 @@ $(function () {
             </label>
           <label class="control-label">昵称</label>
           <div class="controls">
-            <input class="form-control" v-model="name" type="text" required placeholder='昵称' />
+            <input class="form-control" v-model="username" type="text" required placeholder='昵称' />
             <div class="help-block"></div>
           </div>
         </div>
