@@ -124,7 +124,7 @@ function initVM(userinfo){
                 
                 $.ajax({
                     type: "POST",
-                    url: "/edit-profile",
+                    url: "/admin_edit-profile/{{user.id}}",
                     data: {username: this.username.trim(),
                           location: this.location,
                           about_me: this.about_me},
