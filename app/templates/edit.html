@@ -49,7 +49,9 @@ function cheack(){
 {% endblock %}
 
 {% block content %}
-        <form id="myform" action="/edit" method="POST" class="uk-form uk-form-stacked"  >
+
+  {% if post %}
+        <form id="myform" action="/edit/{{ post.id }}" method="POST" class="uk-form uk-form-stacked"  >
             <div class="form-group">
           <label class="fa-label">
               <i class="fa fa-user"></i>
@@ -75,4 +77,34 @@ function cheack(){
                 <a href="/" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
             </div>
         </form>
+    {% else %}
+
+            <form id="myform" action="/edit" method="POST" class="uk-form uk-form-stacked"  >
+            <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-user"></i>
+            </label>
+          <label class="control-label">标题</label>
+                <div class="controls">
+                    <input id="title" name="title" type="text" placeholder="标题" class="uk-width-1-1">
+                </div>
+            </div>
+
+            <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">正文</label>
+          <div class="controls">   
+          <div class="uk-htmleditor-code"><textarea data-uk-check-display="1" style="display: none;" data-uk-htmleditor="{maxsplitsize:600, markdown:true}" id="body" name="body"></textarea>
+        </div>
+      </div>
+        </div>
+            <div class="form-group">
+                <button type="button" onclick=cheack() class="login-btn btn-primary btn"><i class="uk-icon-save"></i> 保存</button>
+                <a href="/" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+            </div>
+        </form>
+
+    {% endif %}
 {% endblock %}

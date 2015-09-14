@@ -96,10 +96,7 @@ def edit_blog():
 			author=current_user._get_current_object())
 		db.session.add(post)
 		return redirect('/')
-	post = Post(title='',
-				body='',
-				author=current_user._get_current_object())
-	return render_template('edit.html', post=post)
+	return render_template('edit.html')
 
 #single blog
 @main.route('/post/<int:id>')
@@ -115,10 +112,9 @@ def edit(id):
 	if current_user != post.author and \
 			not current_user.can(Permission.ADMINISTER):
 		abort(403)
-		if request.method == 'POST':
-			post = Post(title=request.form['title'],
-				body=request.form['body'],
-				author=current_user._get_current_object())
-			db.session.add(post)
-			return redirect(url_for('post', id=post.id))
+	if request.method == 'POST':
+		post.title = request.form['title']
+		post.body = request.form['body']
+		db.session.add(post)
+		return redirect(url_for('.post', id=post.id))
 	return render_template('edit.html', post=post)
