@@ -14,7 +14,7 @@ def login():
 		elif not user.verify_password(request.form.get('passwd')):
 			return make_response('Invalid password', 500)
 		else:
-			login_user(user, False)
+			login_user(user, False)								#false 表示关闭浏览器自动删除登陆状态
 	return render_template('auth/login.html')
 
 

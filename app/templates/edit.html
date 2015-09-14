@@ -1,0 +1,78 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{% block title %}编辑日志{% endblock %}
+
+{% block beforehead %}
+		<link rel="stylesheet" href="/static/uikit/css/uikit.css">
+		<script src="/static/uikit/js/uikit.min.js"></script>
+        <link rel="stylesheet" href="/static/css/codemirror.css">
+        <script src="/static/js/codemirror/lib/codemirror.js"></script>
+        <script src="/static/js/codemirror/mode/markdown/markdown.js"></script>
+        <script src="/static/js/codemirror/addon/mode/overlay.js"></script>
+        <script src="/static/js/codemirror/mode/xml/xml.js"></script>
+        <script src="/static/js/codemirror/mode/gfm/gfm.js"></script>
+        <script src="/static/js/marked.js"></script>
+
+        <link rel="stylesheet" href="/static/uikit/css/components/htmleditor.css">
+        <script src="/static/uikit/js/components/htmleditor.js"></script>
+
+        <script src="/static/js/vue.min.js"></script> 
+<script>
+  function showFormError(str){
+    info = "<div class='alert alert-warning alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
+    info+=str;
+    info+="</div>"
+    $("div").remove(".alert");
+    $("form").prepend(info)
+  }
+
+function cheack(){
+	if($("#title").val()==''){
+		showFormError("请添加标题！");
+		return false;
+	}
+	else if($("#body").val()==''){
+		showFormError("正文为空！");
+	}
+	else{
+		$("#myform").submit();
+		//return location.assign('/');
+	}
+	
+}
+
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+        <form id="myform" action="/edit" method="POST" class="uk-form uk-form-stacked"  >
+            <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-user"></i>
+            </label>
+          <label class="control-label">标题</label>
+                <div class="controls">
+                    <input id="title" name="title" type="text" placeholder="标题" class="uk-width-1-1" value="{{ post.title }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+          <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">正文</label>
+          <div class="controls">   
+    	   	<div class="uk-htmleditor-code"><textarea data-uk-check-display="1" style="display: none;" data-uk-htmleditor="{maxsplitsize:600, markdown:true}" id="body" name="body">{{ post.body }}</textarea>
+		  	</div>
+		  </div>
+        </div>
+            <div class="form-group">
+                <button type="button" onclick=cheack() class="login-btn btn-primary btn"><i class="uk-icon-save"></i> 保存</button>
+                <a href="/" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+            </div>
+        </form>
+{% endblock %}
