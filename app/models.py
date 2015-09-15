@@ -14,6 +14,16 @@ class Permission:
 	WRITE_ARTICLES = 0x04
 	MODERATE_COMMENTS = 0x08
 	ADMINISTER = 0x80
+	
+
+#关注关系表
+class Follow(db.Model):
+	__tablename__ = 'follows'
+	follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+							primary_key=True)
+	followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+							primary_key=True)
+	timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 #角色
@@ -63,6 +73,19 @@ class User(UserMixin,db.Model):
 	member_since = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 	last_seen = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
+	comments = db.relationship('Comment', backref='author', lazy='dynamic')
+
+	##关注外键关系表
+	followed = db.relationship('Follow',
+					foreign_keys=[Follow.follower_id],
+					backref=db.backref('follower', lazy='joined'),
+					lazy='dynamic',
+					cascade='all, delete-orphan')
+	followers = db.relationship('Follow',
+					foreign_keys=[Follow.followed_id],
+					backref=db.backref('followed', lazy='joined'),
+					lazy='dynamic',
+					cascade='all, delete-orphan')
 
 	def __init__(self, **kwargs):
 		super(User, self).__init__(**kwargs)
@@ -96,6 +119,40 @@ class User(UserMixin,db.Model):
 	def ping(self):
 		self.last_seen = datetime.datetime.utcnow()
 		db.session.add(self)
+
+	#执行关注
+	def follow(self, user):
+		if not self.is_following(user):
+			f = Follow(follower=self, followed=user)
+			db.session.add(f)
+	#取消关注
+	def unfollow(self, user):
+		f = self.followed.filter_by(followed_id=user.id).first()
+		if f:
+			db.session.delete(f)
+	#是否关注
+	def is_following(self, user):
+		return self.followed.filter_by(
+				followed_id=user.id).first() is not None
+	#是否被关注
+	def is_followed_by(self, user):
+		return self.followers.filter_by(
+				follower_id=user.id).first() is not None
+
+	#我关注的人的blog
+	@property
+	def followed_posts(self):
+		return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
+				.filter(Follow.follower_id == self.id)
+
+	#将自己添加为自己关注人以方便在关注的blog中看到自己的blog
+	@staticmethod
+	def add_self_follows():
+		for user in User.query.all():
+			if not user.is_following(user):
+				user.follow(user)
+				db.session.add(user)
+				db.session.commit()
 
 	#生成虚拟User测试数据
 	@staticmethod
@@ -152,6 +209,7 @@ class Post(db.Model):
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	body_html = db.Column(db.Text)
+	comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
 	#生成虚拟Post测试数据
 	@staticmethod
@@ -181,3 +239,15 @@ class Post(db.Model):
 			tags=allowed_tags, strip=True))
 #自动识别并转义
 db.event.listen(Post.body, 'set', Post.on_changed_body)
+
+
+##评论
+class Comment(db.Model):
+	__tablename__ = 'comments'
+	id = db.Column(db.Integer, primary_key=True)
+	body = db.Column(db.Text)
+	timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
+	disabled = db.Column(db.Boolean)
+	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+

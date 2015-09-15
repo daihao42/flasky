@@ -65,6 +65,8 @@ $(function () {
 {{ current_user.username }}
 <img src={{ current_user.image }}>
 <a href="/user/{{ current_user.username }}">个人主页</a>
+<a href="/followed">关注的</a>
+<a href="/all">所有的</a>
 
 <!--
 {% if current_user.can(Permission.WRITE_ARTICLES) %}

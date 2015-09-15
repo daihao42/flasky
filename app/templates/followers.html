@@ -1,0 +1,28 @@
+{% extends '__base__.html' %}
+
+{{ super() }}
+
+{% import "_macros.html" as macros %} <!--分页宏-->
+
+{% block title %}{{ title }}{{ user.username }}{% endblock %}
+
+{% block beforehead %}
+
+{% endblock %}
+
+{% block content %}
+
+<div>
+{% for follow in follows %}
+	<!-- 不让自己显示在自己的关注列表中 -->
+	{% if follow.user != user %}
+	<p>{{ follow.user.username }}</p>
+	<img src="{{ follow.user.image }}">
+	{% endif %}
+{% endfor %}
+</div>
+
+<div class="pagination">
+{{ macros.pagination_widget(pagination, '.index') }}
+</div>
+{% endblock %}
