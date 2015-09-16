@@ -128,7 +128,8 @@ function initVM(userinfo){
                     url: "/admin_edit-profile/{{user.id}}",
                     data: {username: this.username.trim(),
                           location: this.location,
-                          about_me: this.about_me},
+                          about_me: this.about_me,
+                          role_id: this.role_id},
                     dataType: "text",
                     success: function(data){
                             return location.assign('/');
@@ -147,7 +148,8 @@ $(function () {
         initVM({
             username: "{{user.username}}",
             location: "{{user.location}}",
-            about_me: "{{user.about_me}}"
+            about_me: "{{user.about_me}}",
+            role_id: "{{user.role_id}}"
         });
 });
 </script>
@@ -174,6 +176,16 @@ $(function () {
           <label class="control-label">居住地</label>
           <div class="controls">
             <input class="form-control" v-model="location" type="text" required placeholder='居住地'/>
+          </div>
+        </div>
+
+        <div class="form-group">
+            <label class="fa-label">
+              <i class="fa fa-unlock-alt"></i>
+            </label>
+          <label class="control-label">角色</label>
+          <div class="controls">
+            <input class="form-control" v-model="role_id" type="text" required placeholder='角色'/>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 from flask import render_template, session, redirect, url_for, request, make_response, abort, flash
 from . import main
 from .. import db
-from ..models import User, Permission, Post
+from ..models import User, Permission, Post, Comment
 from flask.ext.login import login_required
 from app.decorators import admin_required, permission_required
 from flask.ext.login import current_user
@@ -9,19 +9,6 @@ from flask import current_app
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-	'''
-	if request.method == 'POST':
-		post = Post(title=request.form['title'],
-			body=request.form['body'],
-			author=current_user._get_current_object())
-		db.session.add(post)
-	page = request.args.get('page', 1, type=int)
-	#error_out表示page超过时，True返回404，Flase返回空
-	pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
-		page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],error_out=True)  
-	posts = pagination.items
-	return render_template('index.html', posts=posts,pagination=pagination)
-	'''
 	page = request.args.get('page', 1, type=int)
 	show_followed = False
 	if current_user.is_authenticated:
@@ -30,6 +17,7 @@ def index():
 		query = current_user.followed_posts
 	else:
 		query = Post.query
+	#error_out表示page超过时，True返回404，Flase返回空
 	pagination = query.order_by(Post.timestamp.desc()).paginate(
 			page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
 			error_out=False)
@@ -112,6 +100,7 @@ def edit_profile_admin(id):
 		user.username = request.form['username']
 		user.location = request.form['location']
 		user.about_me = request.form['about_me']
+		user.role_id = request.form['role_id']
 		db.session.add(user)
 	return render_template('edit_profile.html', user=user)
 
@@ -131,10 +120,26 @@ def edit_blog():
 	return render_template('edit.html')
 
 #single blog
-@main.route('/post/<int:id>')
+@main.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
 	post = Post.query.get_or_404(id)
-	return render_template('post.html', post=post)
+	if request.method == 'POST':
+		comment = Comment(body=request.form['body'],
+					post=post,
+					author=current_user._get_current_object())
+		db.session.add(comment)
+		flash('Your comment has been published.')
+		return redirect(url_for('.post', id=post.id, page=-1))
+	page = request.args.get('page', 1, type=int)
+	if page == -1:
+		page = (post.comments.count() - 1) / \
+			current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1
+	pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
+				page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+				error_out=False)
+	comments = pagination.items
+	return render_template('post.html', post=post, 
+							comments=comments, pagination=pagination)
 
 #edit blog which is alive
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -151,6 +156,23 @@ def edit(id):
 		##url_for post前加点是解决一个神奇的bug，大概与Blueprint的工厂模式有关
 		return redirect(url_for('.post', id=post.id))
 	return render_template('edit.html', post=post)
+
+#delete blog
+@main.route('/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete(id):
+	post = Post.query.get_or_404(id)
+	if current_user != post.author and \
+			not current_user.can(Permission.ADMINISTER):
+		abort(403)
+	for comment in post.comments:
+		db.session.delete(comment)
+	username = post.author.username
+	title = post.title
+	db.session.delete(post)
+	flash('Your blog %s has been deleted!' % title)
+	return redirect(url_for('.user', username = username))
+
 
 
 #关注
@@ -218,3 +240,38 @@ def followed_by(username):
 	return render_template('followers.html', user=user, title="Followed by",
 		endpoint='.followed_by', pagination=pagination,
 		follows=follows)
+
+#协管员管理评论页面
+@main.route('/moderate')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def moderate():
+	page = request.args.get('page', 1, type=int)
+	pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
+			page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+			error_out=False)
+	comments = pagination.items
+	return render_template('moderate.html', comments=comments,
+							pagination=pagination, page=page)
+
+#协管员允许评论
+@main.route('/moderate/enable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def moderate_enable(id):
+	comment = Comment.query.get_or_404(id)
+	comment.disabled = False
+	db.session.add(comment)
+	return redirect(url_for('.moderate',
+			page=request.args.get('page', 1, type=int)))
+
+#协管员禁止评论
+@main.route('/moderate/disable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def moderate_disable(id):
+	comment = Comment.query.get_or_404(id)
+	comment.disabled = True
+	db.session.add(comment)
+	return redirect(url_for('.moderate',
+			page=request.args.get('page', 1, type=int)))

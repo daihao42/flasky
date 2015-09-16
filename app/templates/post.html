@@ -2,14 +2,13 @@
 
 {% block title %}Flasky - Post{% endblock %}
 
+{% import "_macros.html" as macros %} <!--分页宏-->
+
 {% block beforehead %}
 
 {% endblock %}
 
 {% block content %}
-
-<!--导入moment.js模块-->
-{{ moment.include_moment() }}
 
 <div class="profile-thumbnail">
 			<a href="{{ url_for('.user', username=post.author.username) }}">
@@ -35,12 +34,23 @@
 			{% endif %}
 		</div>
 
+		{% if current_user.is_authenticated %}
 		<div>
 			<form action="{{ url_for('.post', id=post.id) }}" method="POST">
-				<textarea></textarea>
+				<textarea name="body"></textarea>
 				<input type="submit"></input>
 			</form>
 		</div>
+		{% endif %}
+
+		<!-- comment的显示页面 -->
+		{% include '_comments.html' %}
+
+<!--分页-->
+<div class="pagination">
+{{ macros.pagination_widget(pagination, '.post', id = post.id) }}
+</div>
+
 
 
 {% endblock %}

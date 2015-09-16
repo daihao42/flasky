@@ -94,6 +94,7 @@ class User(UserMixin,db.Model):
 				self.role = Role.query.filter_by(permissions=0xff).first()
 			if self.role is None:
 				self.role = Role.query.filter_by(default=True).first()
+		self.follow(self)
 
 	@property
 	def password(self):

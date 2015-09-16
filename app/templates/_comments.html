@@ -1,0 +1,31 @@
+<ul class="comments">
+	{% for comment in comments %}
+	<div class="comment-body">
+		{% if comment.disabled %}
+			<p></p><i>This comment has been disabled by a moderator.</i></p>
+			<a href="{{ url_for('.user', username=comment.author.username) }}">
+			{{ comment.author.username }}</a>
+		{% endif %}
+		{% if moderate or not comment.disabled %}
+			{{ comment.body }}
+			<br />
+			<a href="{{ url_for('.user', username=comment.author.username) }}">
+				{{ comment.author.username }}</a>
+		{% endif %}
+</div>
+
+<!-- 协管员显示管理按钮 -->
+	{% if moderate %}
+		<br>
+		{% if comment.disabled %}
+		<a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable',
+					id=comment.id, page=page) }}">Enable</a>
+		{% else %}
+		<a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable',
+					id=comment.id, page=page) }}">Disable</a>
+		{% endif %}
+	{% endif %}
+<!-- ^^^协管员显示管理按钮 -->
+
+	{% endfor %}
+</ul>
