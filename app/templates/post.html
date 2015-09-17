@@ -5,22 +5,42 @@
 {% import "_macros.html" as macros %} <!--分页宏-->
 
 {% block beforehead %}
+<style type="text/css">
+	.all_in{
+		width:90%; 
+		margin:0 auto;
+	}
+	.blog-all{
+	width:75%;
+    float:left;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+}
+	.userinfo{
+    width:20%;
+    float:right;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+	}
+	.pagination{
+	clear:both;
+    text-align: center;
+	}
+	.comment{
+		width:50%;
+	}
+	textarea{
+		resize:none;
+	}
+</style>
+
 
 {% endblock %}
 
 {% block content %}
-
-<div class="profile-thumbnail">
-			<a href="{{ url_for('.user', username=post.author.username) }}">
-			<img class="img-rounded profile-thumbnail" src="{{ post.author.image }}"></a>
-		</div>
-		<h2> {{ post.title }} </h2>
-		<div class="post-date">{{ moment(post.timestamp).fromNow() }}</div>
-		<div class="post-author">
-			<a href="{{ url_for('.user', username=post.author.username) }}">
-				{{ post.author.username }}</a>
-		</div>
-		<div class="post-body">{{ post.body_html|safe }}</div>
+<div class="all_in">
+ <div class="blog-all">
+          <div class="blog-post">
+            <h2 class="blog-post-title">{{ post.title }}</h2>
+            <p class="blog-post-meta"><script type="text/javascript">document.write(moment.utc("{{post.timestamp}}").fromNow())</script> by <a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></p>
+            </div>
+			<div class="blog-post-body">{{ post.body_html|safe }}</div>
 
 		<div class="post-footer">
 			{% if current_user == post.author %}
@@ -33,12 +53,15 @@
 			</a>
 			{% endif %}
 		</div>
-
+		<hr />
 		{% if current_user.is_authenticated %}
-		<div>
-			<form action="{{ url_for('.post', id=post.id) }}" method="POST">
-				<textarea name="body"></textarea>
-				<input type="submit"></input>
+		<div class="comment">
+		<span class="label label-default">发表评论：</span>
+		<p></p>
+		<form action="{{ url_for('.post', id=post.id) }}" method="POST">
+				<textarea name="body" wrap="soft" class="form-control" required  placeholder="说点什么吧" rows=4></textarea>
+				<p></p>
+				<input type="submit" class="btn btn-success" value="评论"></input>
 			</form>
 		</div>
 		{% endif %}
@@ -46,11 +69,54 @@
 		<!-- comment的显示页面 -->
 		{% include '_comments.html' %}
 
-<!--分页-->
-<div class="pagination">
-{{ macros.pagination_widget(pagination, '.post', id = post.id) }}
+
+	<!--分页-->
+			<div class="pagination">
+	{{ macros.pagination_widget(pagination, '.post', id = post.id) }}
+			</div>
+		</div>
+
+
+  <div class="userinfo">
+    <div class="thumbnail">
+      <img src="{{post.author.image}}" alt="userimg" class="img-responsive img-circle">
+      <div class="caption">
+        <h3>{{ post.author.username }}</h3>
+
+        {% if post.author.location %}
+		<p>地址：<a href="http://maps.google.com/?q={{ post.author.location }}">
+		{{ post.author.location }}</a>
+		</p>
+		{% endif %}
+
+		{% if current_user.is_administrator() %}
+		<p><a href="mailto:{{ post.author.email }}">{{ post.author.email }}</a></p>
+		{% endif %}
+		{% if post.author.about_me %}<p>签名：{{ post.author.about_me }}</p>{% endif %}
+
+        	<!-- 关注 -->
+        <p><a href="{{ url_for('.followers', username=post.author.username) }}">关注他的 <span class="badge">{{ post.author.followers.count() - 1 }}</span></a>
+			<a href="{{ url_for('.followed_by', username=post.author.username) }}">他关注的 <span class="badge">{{ post.author.followed.count() - 1 }}</span>
+			</a></p>
+		
+			{% if current_user.is_authenticated and post.author != current_user and
+			post.author.is_following(current_user) %}
+			<p><span class="label label-default">Follows you</span></p>
+			{% endif %}
+        
+        {% if current_user.can(Permission.FOLLOW) and post.author != current_user %}
+			{% if not current_user.is_following(post.author) %}
+			<p><a href="{{ url_for('.follow', username=post.author.username) }}"
+	class="btn btn-primary" role="button">关注</a></p>
+			{% else %}
+			<p><a href="{{ url_for('.unfollow', username=post.author.username) }}"
+	class="btn btn-default" role="button">取消关注</a></p>
+			{% endif %}
+		{% endif %}
+		<!-- ^^关注 -->
+      </div>
+    </div>
+  </div>
 </div>
-
-
 
 {% endblock %}

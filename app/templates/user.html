@@ -8,66 +8,88 @@
 
 {% block beforehead %}
 
+<style type="text/css">
+	.all_i{
+		width:90%; 
+		margin:0 auto;
+	}
+	.post{
+	width:80%;
+    float:left;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+}
+	.userinfo{
+    width:20%;
+    float:right;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+	}
+	.pagination{
+	clear:both;
+    text-align: center;
+	}
+</style>
 {% endblock %}
 
 {% block content %}
 
-<div class="page-header">
+<div class="all_i">
+	<div class="post">
+	<!-- blog的显示页面 -->
+	{% include '_posts.html' %}
+	
+		<div class="pagination" align="center">
+		{{ macros.pagination_widget(pagination, '.index') }}
+		</div>
+	</div>
 
-{% if user == current_user %}
-<!-- common user --> 
-<a href="/edit-profile/{{ user.username }}">编辑资料</a>
 
-{% elif current_user.is_administrator() %}
- <!-- administrator -->
-<a href="/admin_edit-profile/{{ user.id }}">编辑资料</a>
+  <div class="userinfo">
+    <div class="thumbnail">
+      <img src="{{user.image}}" alt="userimg" class="img-responsive img-circle">
+      <div class="caption">
+        <h3>{{ user.username }}</h3>
 
-{% endif %}
-
-<!-- 关注 -->
-{% if current_user.can(Permission.FOLLOW) and user != current_user %}
-{% if not current_user.is_following(user) %}
-<a href="{{ url_for('.follow', username=user.username) }}"
-class="btn btn-primary">Follow</a>
-{% else %}
-<a href="{{ url_for('.unfollow', username=user.username) }}"
-class="btn btn-default">Unfollow</a>
-{% endif %}
-{% endif %}
-<a href="{{ url_for('.followers', username=user.username) }}">
-Followers: <span class="badge">{{ user.followers.count() - 1 }}</span>
-</a>
-
-<a href="{{ url_for('.followed_by', username=user.username) }}">
-Following: <span class="badge">{{ user.followed.count() - 1 }}</span>
-</a>
-
-{% if current_user.is_authenticated and user != current_user and
-user.is_following(current_user) %}
-| <span class="label label-default">Follows you</span>
-{% endif %}
-<!-- ^^关注 -->
-
-<!-- common visitor -->
-	<h1>{{ user.username }}</h1>
-	<img src="{{user.image}}">
-	{% if user.location %}
-	<p>
-		<a href="http://maps.google.com/?q={{ user.location }}">
+        {% if user.location %}
+		<p>地址：<a href="http://maps.google.com/?q={{ user.location }}">
 		{{ user.location }}</a>
 		</p>
-	{% endif %}
-	
+		{% endif %}
+
 		{% if current_user.is_administrator() %}
 		<p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
 		{% endif %}
-		{% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+		{% if user.about_me %}<p>签名：{{ user.about_me }}</p>{% endif %}
 
-<!-- blog的显示页面 -->
-{% include '_posts.html' %}
-
-<div class="pagination">
-{{ macros.pagination_widget(pagination, '.index') }}
+        	<!-- 编辑 -->
+			{% if user == current_user %}
+			<!-- common user --> 
+			<p><a href="/edit-profile/{{ user.username }}" class="btn btn-primary">编辑资料</a></p>
+			{% elif current_user.is_administrator() %}
+ 			<!-- administrator -->
+			<p><a href="/admin_edit-profile/{{ user.id }}" class="btn btn-primary">编辑资料</a></p>
+			{% endif %}
+        	<!-- 关注 -->
+        <p><a href="{{ url_for('.followers', username=user.username) }}">关注他的 <span class="badge">{{ user.followers.count() - 1 }}</span></a>
+			<a href="{{ url_for('.followed_by', username=user.username) }}">他关注的 <span class="badge">{{ user.followed.count() - 1 }}</span>
+			</a></p>
+		
+			{% if current_user.is_authenticated and user != current_user and
+			user.is_following(current_user) %}
+			<p><span class="label label-default">正在关注你</span></p>
+			{% endif %}
+        
+        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+			{% if not current_user.is_following(user) %}
+			<p><a href="{{ url_for('.follow', username=user.username) }}"
+	class="btn btn-primary" role="button">关注</a></p>
+			{% else %}
+			<p><a href="{{ url_for('.unfollow', username=user.username) }}"
+	class="btn btn-default" role="button">取消关注</a></p>
+			{% endif %}
+		{% endif %}
+		<!-- ^^关注 -->
+      </div>
+    </div>
+  </div>
 </div>
+
 
 {% endblock %}

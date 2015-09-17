@@ -6,12 +6,38 @@
 
 {% block beforehead %}
 <script src="/static/js/vue.min.js"></script> 
+<script src="/static/js/dropzone.min.js" type="text/javascript"></script> 
+<link rel="stylesheet" href="/static/css/dropzone.min.css">
 
+<div id="dropz"></div>
+<script>
+    Dropzone.options.dropz = {
+    maxFilesize: 1.2, // MB
+    acceptedFiles: ".jpg,.gif,.png",
+    maxFiles: 1,
+    }
+</script>
+
+<style type="text/css">
+  .headimg{
+    width:100%; 
+    margin:0 auto;
+  }
+  .nowimg{
+    width:20%;
+    float:left;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+  }
+  .updateimg{
+    width:80%;
+    float:left;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+  }
+  .userdata{
+    width:100%; 
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-
 
 {% if user == current_user %}
 <!-- common user -->
@@ -62,14 +88,24 @@ $(function () {
 });
 </script>
 
-<img src="{{user.image}}">
-
 <div class="container">
-  <form class="form-vertical" id="vm" v-on="submit: submit">
+<div class="headimg">
+<div class="nowimg">
+<label class="fa-label">
+            头像：</label><img src="{{user.image}}" alt="userimg" class="img-responsive img-circle" width="80px">
+</div>
+<div class="updateimg">
+<label class="fa-label">
+            更换头像：</label>
+      <form action="/uploadimg/{{ user.id }}" method="post"
+                enctype="multipart/form-data" class="dropzone"
+                id="dropz">
+            </form>
+            </div>
+</div>
+<div class="userdata">
+  <form class="form-vertical" id="vm" v-on="submit: submit" >
         <div class="form-group">
-          <label class="fa-label">
-              <i class="fa fa-user"></i>
-            </label>
           <label class="control-label">昵称</label>
           <div class="controls">
             <input class="form-control" v-model="username" type="text" required placeholder='昵称' />
@@ -78,9 +114,6 @@ $(function () {
         </div>
 
         <div class="form-group">
-            <label class="fa-label">
-              <i class="fa fa-unlock-alt"></i>
-            </label>
           <label class="control-label">居住地</label>
           <div class="controls">
             <input class="form-control" v-model="location" type="text" required placeholder='居住地'/>
@@ -88,12 +121,9 @@ $(function () {
         </div>
 
         <div class="form-group">
-          <label class="fa-label">
-              <i class="fa fa-unlock-alt"></i>
-            </label>
           <label class="control-label">个人介绍</label>
           <div class="controls">
-             <textarea v-model="about_me" rows="16" placeholder="个人介绍" style="resize:none;"></textarea>
+             <textarea v-model="about_me" rows=6 placeholder="个人介绍" style="resize:none;width:100%"></textarea>
           </div>
         </div>
 
@@ -101,6 +131,7 @@ $(function () {
           <input class="login-btn btn-primary btn" type="submit" value="提交" />
           </div>
       </form> 
+    </div>
 </div>
 
 {% elif current_user.is_administrator() %}
@@ -154,9 +185,23 @@ $(function () {
 });
 </script>
 
-<img src="{{user.image}}">
 
 <div class="container">
+<div class="headimg">
+<div class="nowimg">
+<label class="fa-label">
+            头像：</label><img src="{{user.image}}" alt="userimg" class="img-responsive img-circle" width="80px">
+</div>
+<div class="updateimg">
+<label class="fa-label">
+            更换头像：</label>
+      <form action="/uploadimg/{{ user.id }}" method="post"
+                enctype="multipart/form-data" class="dropzone"
+                id="dropz">
+            </form>
+            </div>
+</div>
+<div class="userdata">
   <form class="form-vertical" id="vm" v-on="submit: submit">
         <div class="form-group">
           <label class="fa-label">
@@ -195,7 +240,7 @@ $(function () {
             </label>
           <label class="control-label">个人介绍</label>
           <div class="controls">
-             <textarea v-model="about_me" rows="16" placeholder="个人介绍" style="resize:none;"></textarea>
+             <textarea v-model="about_me" rows="6" placeholder="个人介绍" style="resize:none;"></textarea>
           </div>
         </div>
 
@@ -203,6 +248,7 @@ $(function () {
           <input class="login-btn btn-primary btn" type="submit" value="提交" />
           </div>
       </form> 
+  </div>
 </div>
 {% endif %}
 

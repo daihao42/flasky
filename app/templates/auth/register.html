@@ -6,7 +6,8 @@
 
 <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css" />
 <script src="/static/js/vue.min.js"></script> 
-
+    <link rel="stylesheet" href="/static/uikit/css/uikit.css">
+    <script src="/static/uikit/js/uikit.min.js"></script>
 <script>
   function validateEmail(email) {
     var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
@@ -118,7 +119,39 @@ $(function () {
         <div class="form-group">
           <div class="controls">
             <span class="checkbox mtm ">
-              <label> <input type="checkbox" v-model="_remember_me" checked="checked"> 同意协议 </label>
+              <label> <input type="checkbox" v-model="_remember_me" checked="checked">  
+                  <a href="#modal-5" class="uk-button" data-uk-modal>本站用户协议</a>
+                        <div id="modal-5" class="uk-modal">
+                            <div class="uk-modal-dialog uk-modal-dialog-large">
+                                <button type="button" class="uk-modal-close uk-close"></button>
+                                <h1>用户准则</h1>
+                                <p>看到这个时，多半是我不小心把它上线了。守则确认框没做，所以点不点都算你同意了。这点郑重声明。以下是《文明上网规范要求》：</p>
+                                <div class="uk-overflow-container">
+                                    <h2>文明上网规范要求</h2>
+                                    <p></p>
+                                    <p>（1）严格遵守《中华人民共和国计算机信息网络国际联网管理暂行规定》、《互联网信息服务管理办法》等国家法律法规。恪守网络道德，文明上网。</p>
+                                    <p></p>
+                                    <p>（2）自觉遵守有关保守国家机密的各项法律规定，不泄露党和国家机密，或传送有损国格、人格的信息；禁止在网络上从事违法犯罪活动。不制作、查阅、复制和传播有碍社会治安及社会公德和有伤社会风化的信息。不得发表任何诋毁国家、政府、党的言论，不得发表任何有碍社会稳定、国家统一和民族统一的言论。</p>
+                                    <p></p>
+                                    <p>（3）不得擅自复制和使用网络上未公开和未授权的文件；不得在网络中擅自传播或拷贝享有版权的软件，或销售免费共享的软件。网络上所有资源的使用应遵循知识产权的有关法律法规。不利用网络盗窃别人的研究成果和受法律保护的资源。</p>
+                                    <p></p>
+                                    <p>（4）不得使用软件的或硬件的方法窃取他人口令，非法入侵他人计算机系统，阅读他人文件或电子邮件，滥用网络资源。不得制造和传播计算机病毒等破坏性程序。禁止破坏数据、破坏网络资源，或其它恶作剧行为。</p>
+                                    <p></p>
+                                    <p>（5）不在网络上接收和散布封建迷信、淫秽、色情、赌博、暴力、凶杀、恐怖等有害信息。不得浏览色情、暴力、不健康的网站网页。</p>
+                                    <p></p>
+                                    <p>（6）不得捏造或歪曲事实、散布谣言、诽谤他人、扰乱社会秩序的不良信息。</p>
+                                    <p></p>
+                                    <p>（7）要善于网上学习，不浏览不良信息；要诚实友好交流，不侮辱欺诈他人；要增强自护意识，不随意约会网友；要维护网络安全，不破坏网络秩序；</p>
+                                    <p></p>
+                                    <p>（8）有违反上述规则造成不良影响和后果的，将视情节给予严肃处理。</p>
+                                    <p></p>
+                                </div>
+                                <h2>默认用户同意以上协议。</h2>
+                                <p></p>
+                            </div>
+                        </div>
+
+              </label>
             </span>
           </div>
           <input class="login-btn btn-primary btn" type="submit" value="注册" />        </div>

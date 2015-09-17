@@ -6,6 +6,8 @@ from flask.ext.login import login_required
 from app.decorators import admin_required, permission_required
 from flask.ext.login import current_user
 from flask import current_app
+import os
+from werkzeug import secure_filename
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -129,11 +131,16 @@ def post(id):
 					author=current_user._get_current_object())
 		db.session.add(comment)
 		flash('Your comment has been published.')
+		'''
 		return redirect(url_for('.post', id=post.id, page=-1))
 	page = request.args.get('page', 1, type=int)
 	if page == -1:
 		page = (post.comments.count() - 1) / \
 			current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1
+			'''
+		return redirect(url_for('.post', id=post.id))
+	page = request.args.get('page', 1, type=int)
+
 	pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
 				page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
 				error_out=False)
@@ -170,7 +177,7 @@ def delete(id):
 	username = post.author.username
 	title = post.title
 	db.session.delete(post)
-	flash('Your blog %s has been deleted!' % title)
+	flash('你的Blog %s 被删除了!' % title)
 	return redirect(url_for('.user', username = username))
 
 
@@ -188,7 +195,7 @@ def follow(username):
 		flash('You are already following this user.')
 		return redirect(url_for('.user', username=username))
 	current_user.follow(user)
-	flash('You are now following %s.' % username)
+	flash('你现在关注了 %s.' % username)
 	return redirect(url_for('.user', username=username))
 
 #取消关注
@@ -204,7 +211,7 @@ def unfollow(username):
 		flash('You are not following this user.')
 		return redirect(url_for('.user', username=username))
 	current_user.unfollow(user)
-	flash('You are now unfollowing %s.' % username)
+	flash('你现在取关了 %s.' % username)
 	return redirect(url_for('.user', username=username))
 
 #关注我的
@@ -275,3 +282,22 @@ def moderate_disable(id):
 	db.session.add(comment)
 	return redirect(url_for('.moderate',
 			page=request.args.get('page', 1, type=int)))
+
+
+##上传头像
+@main.route('/uploadimg/<int:id>',methods=['GET', 'POST'])
+@login_required
+def uploadimg(id):
+	if request.method == 'POST':
+		f = request.files['file']
+		path=os.path.abspath('.')
+		path=os.path.join(path,"app")
+		path=os.path.join(path,"static")
+		path=os.path.join(path,"headimg")
+		suffix=os.path.splitext(secure_filename(f.filename))[1][1:]
+		path=os.path.join(path,"%s.%s" % (id,suffix))
+		f.save(path)
+		user = User.query.get_or_404(id)
+		user.image = '/static/headimg/%s.%s' % (id,suffix)
+		db.session.add(user) 
+	return 'upload ok'

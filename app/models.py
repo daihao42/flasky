@@ -4,8 +4,11 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin, AnonymousUserMixin
 
-from markdown import markdown
-import bleach
+#from markdown import markdown
+#import bleach
+#用markdown2换掉上面import的bleach处理markdown
+#可以保存img和iframe等标签的信息
+from app import markdown2
 
 ##权限配置
 class Permission:
@@ -232,23 +235,39 @@ class Post(db.Model):
 	#markdown 转义
 	@staticmethod
 	def on_changed_body(target, value, oldvalue, initiator):
+		'''
 		allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
 				'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-				'h1', 'h2', 'h3', 'p']
+				'h1', 'h2', 'h3', 'p', 'img', 'iframe']
 		target.body_html = bleach.linkify(bleach.clean(
 			markdown(value, output_format='html'),
 			tags=allowed_tags, strip=True))
+			'''
+		target.body_html = markdown2.markdown(value)
 #自动识别并转义
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 
+
+##comment转换html
+def text2html(text):
+    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
+    return ''.join(lines)
 
 ##评论
 class Comment(db.Model):
 	__tablename__ = 'comments'
 	id = db.Column(db.Integer, primary_key=True)
 	body = db.Column(db.Text)
+	body_html = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
 	disabled = db.Column(db.Boolean)
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+	@staticmethod
+	def on_changed_body(target, value, oldvalue, initiator):
+		target.body_html = text2html(value)
+#自动识别并转义
+db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+
 

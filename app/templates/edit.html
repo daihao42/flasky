@@ -50,6 +50,8 @@ function cheack(){
 
 {% block content %}
 
+<div class="container">
+
   {% if post %}
         <form id="myform" action="/edit/{{ post.id }}" method="POST" class="uk-form uk-form-stacked"  >
             <div class="form-group">
@@ -107,4 +109,5 @@ function cheack(){
         </form>
 
     {% endif %}
+    </div>
 {% endblock %}

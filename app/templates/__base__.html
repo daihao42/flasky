@@ -13,6 +13,17 @@
     <link href="/static/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/js/moment-with-locales.min.js"></script>
+    <script src="/static/js/react.min.js"></script>
+    <script src="/static/js/JSXTransformer.js"></script>
+    
+    
+    <style type="text/css">
+  footer{
+      background: #A9A9A9;
+      clear:both;
+      text-align:center;
+}
+    </style>
     {% block beforehead %}<!-- before head  -->{% endblock %}
   </head>
   <body>
@@ -32,13 +43,14 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">首页</a></li>
+            <li class="active"><a href="/"><i class="glyphicon glyphicon-home"></i> 首页</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
-
+            </ul>
+            <ul class="nav navbar-nav pull-right">
             {% if current_user.is_authenticated %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+            <li class="dropdown" style="text-align:right;">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="/user/{{ current_user.username }}">个人主页</a></li>
                 <!-- 协管员管理评论 -->
@@ -50,12 +62,12 @@
                 <li><a href="#">Something else here</a></li>
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header"></li>
-                <li><a href="/auth/logout">登出</a></li>
+                <li><a href="/auth/logout"><i class="glyphicon glyphicon-log-out"></i> 登出</a></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
             </li>
             {% else %}
-            <li><a href="/auth/login">登陆</a></li>
+            <li><a href="/auth/login"><i class="glyphicon glyphicon-log-in"></i> 登陆</a></li>
             <li><a href="/auth/register">注册</a></li>
             {% endif %}
           </ul>
@@ -67,20 +79,26 @@
     <br />
     <br />
 
-  <!-- flash -->
 <div class="container">
+  <!-- flash -->
 {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         {{ message }}
     </div>
     {% endfor %}
-</div>
 <!-- ^^flash -->
-
+</div>
         <!-- content -->
             {% block content %}
             {% endblock %}
             <!-- // content -->
+
+  <footer class="footer">
+      <p>Blog template built for <a href="http://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+      <p>
+        <a href="#">Back to top</a>
+      </p>
+    </footer>
     </body>
 </html>

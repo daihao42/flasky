@@ -23,8 +23,9 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="container">
 {% if current_user.is_authenticated %}
+
 <div class="page-header">
       <ul class="nav nav-pills" role="tablist">
         <li role="presentation" id="look_all"><a href="/all">所有的</a></li>
@@ -40,7 +41,7 @@
   <div class="pagination">
     {{ macros.pagination_widget(pagination, '.index') }}
   </div>
-
+</div>
 {% endblock %}
 
 

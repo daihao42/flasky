@@ -1,10 +1,24 @@
 <table style="width:80%;">
+<style type="text/css">
+ p img {
+border: 0;
+margin: 0;
+padding: 0;
+max-width: 60px;
+width: expression(this.width >               180 ?               "180px" :       
+   this.width);
+max-height: 60px;
+height: expression(this.height >              180 ?               "180px" : 
+         
+   this.height);
+}
+</style>
 {% for post in posts %}
 <tr style="border-bottom:dashed 1px #A9A9A9;height:100px;">
 <th>
 	<div>
     <a href="{{ url_for('.user', username=post.author.username) }}">
-      <img class="media-object" src="{{ post.author.image }}" alt="userimg" width="50" height="50" class="thumbnail">
+      <img src="{{ post.author.image }}" alt="userimg" width="80" height="80" class="img-responsive img-circle">
     </a>
   </div>
 </th>
@@ -13,7 +27,7 @@
     <a href="{{ url_for('.post', id=post.id) }}">
               <h4 class="list-group-item-heading">{{ post.title }}</h4></a>
     <p>{{ post.body_html|safe|truncate(60) }}</p>
-    <span ><i class="glyphicon glyphicon-comment"> {{ post.comments.count() }}</i></span>
+    <i class="glyphicon glyphicon-comment"><span class="badge">{{ post.comments.count() }}</span></i>
 </th>
 <th style="float:right">
 		<p></p>
@@ -28,9 +42,22 @@
 			<a href="{{ url_for('.edit', id=post.id) }}">
 			<span class="label label-primary">Edit</span>
 			</a>
-			<a href="{{ url_for('.delete', id=post.id) }}">
-			<span class="label label-danger">Delete</span>
-			</a>
+		
+			<span class="label label-danger" data-toggle="modal" data-target="#myModal">Delete</span>
+			
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>确定删除该blog么？</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="location.assign('{{ url_for('.delete', id=post.id) }}')">确认</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 			{% elif current_user.is_administrator() %}
 			<a href="{{ url_for('.edit', id=post.id) }}">
 			<span class="label label-danger">Edit [Admin]</span>
