@@ -48,11 +48,14 @@
         <h3>{{ user.username }}</h3>
 
         {% if user.location %}
-		<p>地址：<a href="http://maps.google.com/?q={{ user.location }}">
+		<p>地址：<a href="http://map.baidu.com/?q={{ user.location }}">
 		{{ user.location }}</a>
 		</p>
 		{% endif %}
-
+		<p>注册时间：<script type="text/javascript">document.write(moment.utc("{{ user.member_since }}").format('YYYY-MM-DD'))</script></p>
+		{% if user != current_user %}
+		<p>最后登陆：<script type="text/javascript">document.write(moment.utc("{{ user.last_seen }}").fromNow())</script></p>
+		{% endif %}
 		{% if current_user.is_administrator() %}
 		<p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
 		{% endif %}

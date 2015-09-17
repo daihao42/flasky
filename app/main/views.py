@@ -9,6 +9,13 @@ from flask import current_app
 import os
 from werkzeug import secure_filename
 
+##test index2 download from net
+@main.route('/index', methods=['GET', 'POST'])
+def test_index():
+	return render_template('index/index2.html')
+
+
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
 	page = request.args.get('page', 1, type=int)

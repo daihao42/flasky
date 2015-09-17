@@ -8,13 +8,14 @@
 
 {% block beforehead %}
 <script type="text/javascript">
-  $(function active(){
+  $(function (){
     if("{{ show_followed }}" == 'True'){
       $("#look_followed").attr("class","active");
     }
     else {
       $("#look_all").attr("class","active");
     }
+
   });  
   
 </script>

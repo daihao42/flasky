@@ -12,15 +12,37 @@
 
 {% block content %}
 
-<div>
+<table style="width:80%;">
 {% for follow in follows %}
 	<!-- 不让自己显示在自己的关注列表中 -->
 	{% if follow.user != user %}
-	<p>{{ follow.user.username }}</p>
-	<img src="{{ follow.user.image }}">
+
+<tr style="border-bottom:dashed 1px #A9A9A9;height:100px;">
+<th>
+	<div>
+    <a href="{{ url_for('.user', username=follow.user.username) }}">
+      <img src="{{ follow.user.image }}" alt="userimg" width="80" height="80" class="img-responsive img-circle">
+    </a>
+  </div>
+</th>
+<th style="width:50%;">
+	<p></p>
+              <h4 class="list-group-item-heading">{{ follow.user.username }}</h4>
+              <a href="#" data-toggle="tooltip" data-placement="left" title="他的粉丝">
+    <i class="glyphicon glyphicon-thumbs-up" ><span class="badge">{{ follow.user.followers.count() - 1 }}</span></i></a>
+</th>
+<th style="float:right">
+		<p></p>
+		<div class="follow-date">居住地：{{ follow.user.location }}</div>
+		<div class="follow-author" style="float:right">
+			<p>个性签名：{{ follow.user.about_me }}</p>
+		</div>
+</th>
+ </tr>
 	{% endif %}
 {% endfor %}
-</div>
+</table>
+
 
 <div class="pagination">
 {{ macros.pagination_widget(pagination, '.index') }}

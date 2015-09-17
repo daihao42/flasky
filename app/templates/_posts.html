@@ -12,6 +12,9 @@ height: expression(this.height >              180 ?               "180px" :
          
    this.height);
 }
+.post-body{
+	height: 100px;
+}
 </style>
 {% for post in posts %}
 <tr style="border-bottom:dashed 1px #A9A9A9;height:100px;">
@@ -26,7 +29,8 @@ height: expression(this.height >              180 ?               "180px" :
 	<p></p>
     <a href="{{ url_for('.post', id=post.id) }}">
               <h4 class="list-group-item-heading">{{ post.title }}</h4></a>
-    <p>{{ post.body_html|safe|truncate(60) }}</p>
+              <div id="post-body">
+    <p>{{ post.body_html|safe|truncate(60) }}</p></div>
     <i class="glyphicon glyphicon-comment"><span class="badge">{{ post.comments.count() }}</span></i>
 </th>
 <th style="float:right">
